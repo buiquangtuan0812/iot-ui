@@ -40,5 +40,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@tippyjs/react": "^4.2.6",
+    "react-router-dom": "^6.15.0"
   }
 }

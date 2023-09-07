@@ -1,18 +1,21 @@
 .container_app {
     background-color: rgb(193, 207, 234);
-    padding: 40px;
+    padding: 20px 40px 40px 40px;
     .title {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 16px;
+        margin-bottom: 20px;
         h3 {
-            margin-bottom: 24px;
             font-family: 'Roboto', sans-serif;
         }
-        img {
-            width: 80px;
-            height: 80px;
+        .icon-nav {
+            font-size: 32px;
+            padding: 4px;
+            margin-bottom: 20px;
+            :hover {
+                cursor: pointer;
+            }
         }
 
     }

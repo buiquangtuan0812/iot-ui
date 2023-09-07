@@ -2,16 +2,19 @@ import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
 import { useState } from "react";
 import React from "react";
+import Tippy from "@tippyjs/react/headless";
 
-import Temperature from "../components/temperature/Temperature";
-import Humidity from "../components/humidity/Humidity";
-import Brightness from "../components/brightness/Brightness";
-import AreaChart from "../components/chart/AreaChart";
-import ImgLight from "../img/idea.png";
-import LightOf from "../img/big-light.png";
-import FanOff from "../img/fan.png";
-import FanOn from "../img/fan (1).png";
-import Logo from "../img/iot.png";
+import Temperature from "../../components/temperature/Temperature";
+import Humidity from "../../components/humidity/Humidity";
+import Brightness from "../../components/brightness/Brightness";
+import AreaChart from "../../components/chart/AreaChart";
+import Nav from "../../components/navbar/Nav";
+
+import ImgLight from "../../img/idea.png";
+import LightOf from "../../img/big-light.png";
+import FanOff from "../../img/fan.png";
+import FanOn from "../../img/fan (1).png";
+import {HiBars3} from "react-icons/hi2";
 const cx = classNames.bind(styles);
 
 function Home() {
@@ -29,6 +32,14 @@ function Home() {
             setIndex(index + 1);
         }
     }, 5000);
+
+    const renderTippy = (prop) => {
+        return (
+            <div>
+                <Nav/>
+            </div>
+        )
+    }
     
 
     return (
@@ -38,7 +49,13 @@ function Home() {
                     <h3>
                         IoT & Ứng dụng
                     </h3>
-                    <img src={Logo} alt="Logo"/>
+                    <Tippy render={renderTippy} interactive delay={[200, 100]}
+                        offset={[-85, -3]} placement="bottom"
+                    >
+                        <span className={cx('icon-nav')}>
+                                <HiBars3/>
+                        </span>
+                    </Tippy>
                 </div>
             </div>
             <div className={cx('container_app-header')}>
