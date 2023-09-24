@@ -1,6 +1,9 @@
 .container_app {
     background-color: rgb(193, 207, 234);
-    padding: 20px 40px 40px 40px;
+    padding: 32px 52px 52px 52px;
+    top: 0;
+    right: 0;
+    left: 0;
     .title {
         display: flex;
         justify-content: space-between;
@@ -20,7 +23,7 @@
 
     }
     &-body {
-        padding-top: 60px;
+        margin-top: 80px;
         .item-light {
             display: flex;
             justify-content: center;

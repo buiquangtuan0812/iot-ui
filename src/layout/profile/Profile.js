@@ -1,4 +1,5 @@
 import classNames from "classnames/bind";
+import { useLocation } from "react-router-dom";
 import styles from "./Profile.module.scss";
 import {BiLogoFacebookCircle} from "react-icons/bi";
 import {BiLogoGmail} from "react-icons/bi";
@@ -6,10 +7,12 @@ import {AiFillInstagram} from "react-icons/ai";
 import {PiTiktokLogoFill} from "react-icons/pi";
 
 import Image from "../../img/R.jfif";
+import Button from "../../components/button/Button";
 
 const cx = classNames.bind(styles);
 
 function Profile() {
+    const location = useLocation();
     return (
         <div className={cx('ctn')}>
             <div className={cx('container')}>
@@ -17,13 +20,15 @@ function Profile() {
                     <div className={cx('row')}>
                         <div className={cx('col-md-8')}>
                             <div className={cx('nav-left')}>
-                                <div className={cx('nav-header')}>My Profile</div>
+                                <div className={cx('nav-header')}>
+                                    My Profile
+                                </div>
 
                                 <div className={cx('nav-body')}>
                                     <div className={cx('row')}>
                                         <div className={cx('pr-md-1 col-md-5')}>
                                             <div className={cx('form-group')}>
-                                                <label>College</label>
+                                                <label>University</label>
                                                 <input disabled placeholder="College" type="text" 
                                                     className={cx('form-control-disabled')} 
                                                     value="PTIT"
@@ -127,6 +132,7 @@ function Profile() {
 
                                 <div className={cx('nav-footer')}>
                                     <button>Save</button>
+                                    <Button props = {location.state}/>
                                 </div>
                             </div>
                         </div>

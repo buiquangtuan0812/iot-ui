@@ -5,10 +5,11 @@ import { Link } from "react-router-dom";
 import {CgProfile} from "react-icons/cg";
 import {GrHistory} from "react-icons/gr";
 import {MdOutlineSensors} from "react-icons/md";
+import {AiTwotoneHome} from "react-icons/ai";
 
 const cx = classNames.bind(styles);
 
-function Nav() {
+function Nav({props}) {
     return (
         <div className={cx('container__nav')}>
             <svg
@@ -22,7 +23,16 @@ function Nav() {
                 <path d="M0 8c7 0 10-8 12-8s5 8 12 8z"></path>
             </svg>
             <div className={cx('container__item')}>
-                <Link to = "/profile">
+                <Link to = "/" state={props}>
+                    <div className={cx('nav-item')}>
+                        <div>
+                            <AiTwotoneHome className={cx('icon')}/>
+                            Home
+                        </div>
+                    </div>
+                </Link>
+
+                <Link to = "/profile" state={props}>
                     <div className={cx('nav-item')}>
                         <div>
                             <CgProfile className={cx('icon')}/>
@@ -31,19 +41,23 @@ function Nav() {
                     </div>
                 </Link>
 
-                <div className={cx('nav-item')}>
-                    <div>
-                        <MdOutlineSensors className={cx('icon')}/>
-                        Data Sensors
+                <Link to = "/data-sensor" state={props}>
+                    <div className={cx('nav-item')}>
+                        <div>
+                            <MdOutlineSensors className={cx('icon')}/>
+                            Data Sensors
+                        </div>
                     </div>
-                </div>
+                </Link>
 
-                <div className={cx('nav-item')}>
-                    <div>
-                        <GrHistory className={cx('icon')}/>
-                        Action History
+                <Link to = "/action-history" state={props}>
+                    <div className={cx('nav-item')}>
+                        <div>
+                            <GrHistory className={cx('icon')}/>
+                            Action History
+                        </div>
                     </div>
-                </div>
+                </Link>
 
             </div>
         </div>

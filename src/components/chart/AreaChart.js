@@ -1,21 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState} from 'react';
 import classNames from 'classnames/bind';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import styles from './Area.module.scss';
 
 const cx = classNames.bind(styles);
 
-const data = [
-    { name: 'Mon', Temp: 32, Humidity: 80, Bright: 5 },
-    { name: 'Tues', Temp: 34, Humidity: 88, Bright: 5.5 },
-    { name: 'Wenes', Temp: 36, Humidity: 90, Bright: 4 },
-    { name: 'Thur', Temp: 31, Humidity: 87, Bright: 4.6 },
-    { name: 'Fri', Temp: 31, Humidity: 91, Bright: 6 },
-    { name: 'Statur', Temp: 33, Humidity: 79, Bright: 5.3 },
-    { name: 'Sun', Temp: 29, Humidity: 80, Bright: 4.8 },
-];
+const day = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const temp = [32, 30, 36, 40.5, 41, 38.4, 39.6];
+const hum = [80.4, 78, 79.6, 80.3, 85, 88, 86.6];
+const bright = [5, 4.5, 6.5, 7.5, 6.2, 6.1, 5.8];
 
-const ExampleAreaChart = () => {
+function ExampleAreaChart() {
+  const [index, setIndex] = useState(0);
+  const [data, setData] = useState([
+    { name: 'Mon', Temp: 32, Humidity: 80, Bright: 5 },
+    { name: 'Tue', Temp: 34, Humidity: 88, Bright: 5.5 },
+    { name: 'Wed', Temp: 36, Humidity: 90, Bright: 4 },
+    { name: 'Thu', Temp: 31, Humidity: 87, Bright: 4.6 },
+    { name: 'Fri', Temp: 31, Humidity: 91, Bright: 6 },
+    { name: 'Sat', Temp: 33, Humidity: 79, Bright: 5.3 },
+    { name: 'Sun', Temp: 29, Humidity: 80, Bright: 4.8 },
+  ]);
+  useEffect(() => {
+    const interval = setTimeout(() => {
+      const newData = [...data];
+      newData.push({
+        name: day[index],
+        Temp: temp[index],
+        Humidity: hum[index],
+        Bright: bright[index]
+      });
+      newData.shift();
+      setData(newData);
+      if (index === 6) {
+        setIndex(0);
+      }
+      else {
+        setIndex(index + 1);
+      }
+    }, 2000);
+    return () => clearTimeout(interval);
+  }, [index, data]);
+
   return (
     <div className={cx('container_chart')}>
       <ResponsiveContainer width="100%" height={380}>

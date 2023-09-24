@@ -61,6 +61,8 @@
         }
         .nav-footer {
             padding: 15px;
+            display: flex;
+            justify-content: space-between;
             button {
                 background-image: linear-gradient(to bottom left,#e14eca,#ba54f5,#e14eca);
                 background-size: 210% 210%;
@@ -88,6 +90,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        border-radius: 8px;
         .author {
             text-align: center;
             text-transform: none;
