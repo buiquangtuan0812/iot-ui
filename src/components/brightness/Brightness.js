@@ -10,7 +10,7 @@ function Brightness({brightness}) {
         <div className={cx('container')}>
             <div className={cx('description')}>
                 <p className={cx('title')}>Độ sáng</p>
-                <p className={cx('bright')}>{brightness}klux</p>
+                <p className={cx('bright')}>{brightness}lux</p>
             </div>
 
             <div className={cx('img-des')}>

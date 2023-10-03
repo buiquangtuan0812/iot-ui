@@ -5,42 +5,24 @@ import styles from './Area.module.scss';
 
 const cx = classNames.bind(styles);
 
-const day = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const temp = [32, 30, 36, 40.5, 41, 38.4, 39.6];
-const hum = [80.4, 78, 79.6, 80.3, 85, 88, 86.6];
-const bright = [5, 4.5, 6.5, 7.5, 6.2, 6.1, 5.8];
-
-function ExampleAreaChart() {
-  const [index, setIndex] = useState(0);
-  const [data, setData] = useState([
-    { name: 'Mon', Temp: 32, Humidity: 80, Bright: 5 },
-    { name: 'Tue', Temp: 34, Humidity: 88, Bright: 5.5 },
-    { name: 'Wed', Temp: 36, Humidity: 90, Bright: 4 },
-    { name: 'Thu', Temp: 31, Humidity: 87, Bright: 4.6 },
-    { name: 'Fri', Temp: 31, Humidity: 91, Bright: 6 },
-    { name: 'Sat', Temp: 33, Humidity: 79, Bright: 5.3 },
-    { name: 'Sun', Temp: 29, Humidity: 80, Bright: 4.8 },
-  ]);
+function AreaChartComponent(props) {
+  const [data, setData] = useState([]);
   useEffect(() => {
-    const interval = setTimeout(() => {
+    const dataSensor = props.data;
+    if (dataSensor !== '') {
       const newData = [...data];
       newData.push({
-        name: day[index],
-        Temp: temp[index],
-        Humidity: hum[index],
-        Bright: bright[index]
+        name: dataSensor["time"].slice(0, 10) || "Now",
+        Temp: dataSensor["temp"],
+        Humidity: dataSensor["humidity"],
+        Bright: dataSensor["bright"]
       });
-      newData.shift();
+      if (newData.length === 8) {
+        newData.shift();
+      }
       setData(newData);
-      if (index === 6) {
-        setIndex(0);
-      }
-      else {
-        setIndex(index + 1);
-      }
-    }, 2000);
-    return () => clearTimeout(interval);
-  }, [index, data]);
+    }
+  }, [props.data]);
 
   return (
     <div className={cx('container_chart')}>
@@ -59,9 +41,9 @@ function ExampleAreaChart() {
           </Area>
         </AreaChart>
       </ResponsiveContainer>
-      <h5>Biểu đồ nhiệt độ, độ ẩm, ánh sáng tuần qua.</h5>
+      <h5>Biểu đồ nhiệt độ, độ ẩm, ánh sáng.</h5>
     </div>
   );
 };
 
-export default ExampleAreaChart;
+export default AreaChartComponent;

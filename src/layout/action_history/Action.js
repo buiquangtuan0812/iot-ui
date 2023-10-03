@@ -7,17 +7,30 @@ import Tippy from "@tippyjs/react/headless";
 import {HiBars3} from "react-icons/hi2";
 
 import Nav from "../../components/navbar/Nav";
+import SelectBox from "../../components/selectbox/SelectBox";
 
 const cx = classNames.bind(styles);
 
 function Action() {
-    const [data, setData] = useState([]);
     const location = useLocation();
     const props = location.state;
+    const [data, setData] = useState([]);
+    const [startIndex, setStartIndex] = useState(0);
+    const [endIndex, setEndIndex] = useState(0);
+    const [check, setCheck] = useState(false);
+    const [indexClicked, setIndexClicked] = useState(0);
+
     useEffect(() => {
         axios.get('http://localhost:8008/action-history/get-all')
             .then (response => {
                 setData(response.data);
+                if (response.data.length / 4 > 1) {
+                    setEndIndex(4);
+                    setCheck(true);
+                }
+                else {
+                    setEndIndex(response.data.length);
+                }
             })
             .catch(err => console.log(err));
     }, []);
@@ -28,9 +41,9 @@ function Action() {
                 <Nav props = {props}/>
             </div>
         )
-    }
+    };
     
-    const renderData = data.map((item, index) => {
+    const renderData = data.slice(startIndex, endIndex).map((item, index) => {
         const date = new Date(item.time);
         const year = date.getFullYear();
         let month = date.getMonth() + 1;
@@ -46,14 +59,37 @@ function Action() {
         const time = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
         return (
             <tr key = {index}>
-                <td  className={cx('id')}>{item.id}</td>
+                <td  className={cx('id')}>{index + 1}</td>
                 <td>{item.ssid}</td>
                 <td>{item.type}</td>
                 <td>{item.action}</td>
                 <td>{time}</td>
             </tr>
         )
-    })
+    });
+
+    const handleClick = (value) => {
+        setIndexClicked(value);
+        setStartIndex(endIndex);
+        setEndIndex(value * 4 + endIndex);
+    }
+
+    const renderDivider = data.slice(0, data.length / 4).map((item, index) => {
+        if (index === indexClicked) {
+            return (
+                <span key={index} className={cx('clicked')} onClick={() => handleClick(index)}>
+                    {index + 1}
+                </span>
+            )
+        }
+        else {
+            return (
+                <span key={index}  onClick={() => handleClick(index)}>
+                    {index + 1}
+                </span>
+            )
+        }
+    });
 
     return (
         <div className={cx('ctn')}>
@@ -72,20 +108,39 @@ function Action() {
                         </div>
 
                         <div className={cx('card-body')}>
-                        <table className={cx('table')}>
-                            <thead>
-                                <tr>
-                                    <th scope="col" className={cx('id')}>Id</th>
-                                    <th scope="col">Ssid</th>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Action</th>
-                                    <th scope="col">Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {renderData}
-                            </tbody>
-                            </table>
+                            <SelectBox
+                                save = {setData}
+                                type = {'Action History'}
+                            />
+
+                            {data.length > 0 ? 
+                            (<table className={cx('table')}>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" className={cx('id')}>Stt</th>
+                                        <th scope="col">Ssid</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Action</th>
+                                        <th scope="col">Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {renderData}
+                                </tbody>
+                            </table>) : 
+                            (<div className={cx('data-not-found')}>
+                                <span>
+                                    <img
+                                        src="https://frontend.tikicdn.com/_desktop-next/static/img/account/empty-order.png"
+                                        alt=""
+                                    />
+                                </span>
+                                <span className={cx('text')}>No data found for this period of time!</span>
+                            </div>)}
+                        </div>
+
+                        <div className={cx('container-divide')}>
+                            {check ? renderDivider : ''}
                         </div>
                     </div>
                 </div>

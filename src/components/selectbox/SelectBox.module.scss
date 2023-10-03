@@ -1,0 +1,46 @@
+.container_select-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    .item-1 {
+        display: flex;
+        align-items: center;
+        span {
+            margin-right: 12px;
+            font-size: 20px;
+        }
+        color: hsla(0,0%,100%,.7);
+    }
+    .item-2 {
+        display: flex;
+        align-items: center;
+        .box {
+            margin-right: 32px;
+            label {
+                color: hsla(0,0%,100%,.7);
+                margin-right: 12px;
+            }
+        }
+        .box-to {
+            label {
+                color: hsla(0,0%,100%,.7);
+                margin-right: 12px;
+            }
+           
+        }
+        .filter-all {
+            margin-left: 28px;
+            padding: 4px 8px;
+            background-image: linear-gradient(to bottom left, #e14eca, #ba54f5, #e14eca);
+            border-radius: 8px;
+            .icon {
+                font-size: 24px;
+                color: #000;
+            }
+            :hover {
+                cursor: pointer;
+            }
+        }
+    }
+}

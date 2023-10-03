@@ -11,7 +11,7 @@ import Humidity from "../../components/humidity/Humidity";
 import Brightness from "../../components/brightness/Brightness";
 import AreaChart from "../../components/chart/AreaChart";
 import Nav from "../../components/navbar/Nav";
-import SocketIO from "../../websocket/SocketIo";
+import WebSocket from "../../websocket/WebSoket";
 
 import ImgLight from "../../img/idea.png";
 import LightOf from "../../img/big-light.png";
@@ -23,29 +23,13 @@ const cx = classNames.bind(styles);
 function Home() {
     const location = useLocation();
     const props = location.state;
-    const [index, setIndex] = useState(0);
     const [controlLight, setControlLight] = useState(props ? props.stateLed : false);
     const [controlFan, setControlFan] = useState(props ? props.stateFan: false);
+    const [dataSensor, setDataSensor] = useState(null);
 
     const arr = [32, 30, 36, 40.5, 41, 38.4, 39.6];
     const hum = [80.4, 78, 79.6, 80.3, 85, 88, 86.6];
-    const bright = [0.5, 0.45, 0.65, 0.75, 0.62, 0.61, 0.58];
-
-    setTimeout(() => {
-        // axios.get('http://localhost:8008/mosquitto/subscribe')
-        //     .then((response) =>{
-        //         console.log(response.data);
-        //     })
-        //     .catch((error) => {
-        //         console.log(error);
-        //     });
-        if (index === 6) {
-            setIndex(0);
-        }
-        else {
-            setIndex(index + 1);
-        }
-    }, 2000);
+    const bright = [500, 0.45, 0.65, 0.75, 0.62, 0.61, 0.58];
 
     const renderTippy = (prop) => {
         return (
@@ -124,6 +108,10 @@ function Home() {
         //     time: time
         // };
     }
+
+    const saveDataSensor = (data) => {
+        setDataSensor(data);
+    };
     return (
         <div className={cx('container_app')}>
             <div>
@@ -131,7 +119,7 @@ function Home() {
                     <h3>
                         IoT & Ứng dụng
                     </h3>
-                    <Tippy render={renderTippy} interactive delay={[200, 100]}
+                    <Tippy render={renderTippy} interactive delay={[100, 100]}
                         offset={[-85, -3]} placement="bottom"
                     >
                         <span className={cx('icon-nav')}>
@@ -143,20 +131,20 @@ function Home() {
             <div className={cx('container_app-header')}>
                 <div className={cx('row')}>
                     <div className={cx('col-4')}>
-                        <Temperature temp = {arr[index]}/>
+                        <Temperature temp = {dataSensor ? dataSensor["temp"] : arr[0]}/>
                     </div>
                     <div className={cx('col-4')}>
-                        <Humidity humidity = {hum[index]}/>
+                        <Humidity humidity = {dataSensor ? dataSensor["humidity"] : hum[0]}/>
                     </div>
                     <div className={cx('col-4')}>
-                        <Brightness brightness = {bright[index]}/>
+                        <Brightness brightness = {dataSensor ? dataSensor["bright"] : bright[0]}/>
                     </div>
                 </div>
             </div>
             <div className={cx('container_app-body')}>
                 <div className={cx('row')}>
                     <div className={cx('col-9')}>
-                        <AreaChart/>
+                        <AreaChart data = {dataSensor ? dataSensor : ''}/>
                     </div>
                     <div className={cx('col-3')}>
                         <div className={cx('item-light')}>
@@ -183,7 +171,7 @@ function Home() {
                     </div>
                 </div>
             </div>
-            <SocketIO/>
+            <WebSocket save = {saveDataSensor}/>
         </div>
     )
 }

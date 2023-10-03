@@ -1,15 +1,29 @@
 import classNames from "classnames/bind";
 import { useLocation } from "react-router-dom";
+import {useState, useEffect} from "react";
+import axios from "axios";
 import styles from "./Datasensor.module.scss";
 import Tippy from "@tippyjs/react/headless";
 import {HiBars3} from "react-icons/hi2";
 
 import Nav from "../../components/navbar/Nav";
+import SelectBox from "../../components/selectbox/SelectBox";
 
 const cx = classNames.bind(styles);
 
 function Datasensor() {
     const location = useLocation();
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:8008/data-sensor/get-all")
+            .then(response => {
+                setData(response.data);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }, []);
 
     const renderTippy = (prop) => {
         return (
@@ -17,7 +31,33 @@ function Datasensor() {
                 <Nav props = {location.state}/>
             </div>
         )
-    }
+    };
+
+    const renderData = data.map((item, index) => {
+        const date = new Date(item.time);
+        const year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        month = month < 10 ? '0' + month : month;
+        let day = date.getDate();
+        day = day < 10 ? '0' + day : day;
+        let hour = date.getHours();
+        hour = hour < 10 ? '0' + hour : hour;
+        let minute = date.getMinutes();
+        minute = minute < 10 ? '0' + minute : minute;
+        let second = date.getSeconds();
+        second = second < 10 ? '0' + second : second;
+        const time = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+        return (
+            <tr key = {index}>
+                <td  className={cx('id')}>{index + 1}</td>
+                <td>{item.ssid}</td>
+                <td>{item.temperature}</td>
+                <td>{item.humidity}</td>
+                <td>{item.brightness}</td>
+                <td>{time}</td>
+            </tr>
+        )
+    });
 
     return (
         <div className={cx('ctn')}>
@@ -36,52 +76,36 @@ function Datasensor() {
                         </div>
 
                         <div className={cx('card-body')}>
-                        <table className={cx('table')}>
-                            <thead>
-                                <tr>
-                                    <th scope="col" className={cx('id')}>Id</th>
-                                    <th scope="col">Ssid</th>
-                                    <th scope="col">Temperature</th>
-                                    <th scope="col">Humidity</th>
-                                    <th scope="col">Brightness</th>
-                                    <th scope="col">Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td  className={cx('id')}>1</td>
-                                    <td>1</td>
-                                    <td>30.5°C</td>
-                                    <td>80%</td>
-                                    <td>0.5Klux</td>
-                                    <td>08:00</td>
-                                </tr>
-                                <tr>
-                                    <td  className={cx('id')}>2</td>
-                                    <td>1</td>
-                                    <td>32.5°C</td>
-                                    <td>85%</td>
-                                    <td>0.55Klux</td>
-                                    <td>09:00</td>
-                                </tr>
-                                <tr>
-                                    <td  className={cx('id')}>3</td>
-                                    <td>1</td>
-                                    <td>31°C</td>
-                                    <td>88%</td>
-                                    <td>0.54Klux</td>
-                                    <td>10:00</td>
-                                </tr>
-                                <tr>
-                                    <td  className={cx('id')}>4</td>
-                                    <td>1</td>
-                                    <td>31.5°C</td>
-                                    <td>88.4%</td>
-                                    <td>0.53Klux</td>
-                                    <td>11:00</td>
-                                </tr>
-                            </tbody>
+                            <SelectBox
+                                func = {setData}
+                                type = {'Data Sensor'}
+                            />
+                            {data.length > 0 ?
+                            (<table className={cx('table')}>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" className={cx('id')}>Stt</th>
+                                        <th scope="col">Ssid</th>
+                                        <th scope="col">Temperature</th>
+                                        <th scope="col">Humidity</th>
+                                        <th scope="col">Brightness</th>
+                                        <th scope="col">Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {renderData}
+                                </tbody>
                             </table>
+                            ) :
+                            (<div className={cx('data-not-found')}>
+                                <span>
+                                    <img
+                                        src="https://frontend.tikicdn.com/_desktop-next/static/img/account/empty-order.png"
+                                        alt=""
+                                    />
+                                </span>
+                                <span className={cx('text')}>No data found for this period of time!</span>
+                            </div>)}
                         </div>
                     </div>
                 </div>
