@@ -24,8 +24,8 @@ function Action() {
         axios.get('http://localhost:8008/action-history/get-all')
             .then (response => {
                 setData(response.data);
-                if (response.data.length / 4 > 1) {
-                    setEndIndex(4);
+                if (response.data.length / 10 > 1) {
+                    setEndIndex(10);
                     setCheck(true);
                 }
                 else {
@@ -68,13 +68,7 @@ function Action() {
         )
     });
 
-    const handleClick = (value) => {
-        setIndexClicked(value);
-        setStartIndex(endIndex);
-        setEndIndex(value * 4 + endIndex);
-    }
-
-    const renderDivider = data.slice(0, data.length / 4).map((item, index) => {
+    const renderDivider = data.slice(0, data.length / 10 + 1).map((item, index) => {
         if (index === indexClicked) {
             return (
                 <span key={index} className={cx('clicked')} onClick={() => handleClick(index)}>
@@ -90,6 +84,28 @@ function Action() {
             )
         }
     });
+
+    const handleClick = (value) => {
+        if (value > indexClicked) {
+            setStartIndex(startIndex + (value - indexClicked) * 10);
+            setEndIndex((startIndex + (value - indexClicked) * 10) + 10);
+            setIndexClicked(value);
+        }
+        else if (value < indexClicked) {
+            setStartIndex(startIndex - (indexClicked - value) * 10);
+            setEndIndex((startIndex - (indexClicked - value) * 10) + 10);
+            setIndexClicked(value);
+        }
+        else {
+            return;
+        }
+    };
+
+    const reset = () => {
+        setIndexClicked(0);
+        setStartIndex(0);
+        setEndIndex(10);
+    }
 
     return (
         <div className={cx('ctn')}>
@@ -111,6 +127,7 @@ function Action() {
                             <SelectBox
                                 save = {setData}
                                 type = {'Action History'}
+                                reset = {reset}
                             />
 
                             {data.length > 0 ? 

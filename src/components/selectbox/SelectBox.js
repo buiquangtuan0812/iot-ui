@@ -114,6 +114,11 @@ function SelectBox(props) {
     };
 
     const handleClick = () => {
+        setDay('');
+        setMonth('');
+        setStart('');
+        setEnd('');
+        props.reset();
         if (props.type === 'Data Sensor') {
             axios.get('http://localhost:8008/data-sensor/get-all')
                 .then (response => {

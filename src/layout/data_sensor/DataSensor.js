@@ -14,11 +14,22 @@ const cx = classNames.bind(styles);
 function Datasensor() {
     const location = useLocation();
     const [data, setData] = useState([]);
+    const [startIndex, setStartIndex] = useState(0);
+    const [endIndex, setEndIndex] = useState(0);
+    const [check, setCheck] = useState(false);
+    const [indexClicked, setIndexClicked] = useState(0);
 
     useEffect(() => {
         axios.get("http://localhost:8008/data-sensor/get-all")
             .then(response => {
                 setData(response.data);
+                if (response.data.length / 10 > 1) {
+                    setEndIndex(10);
+                    setCheck(true);
+                }
+                else {
+                    setEndIndex(response.data.length);
+                }
             })
             .catch(err => {
                 console.log(err);
@@ -33,7 +44,7 @@ function Datasensor() {
         )
     };
 
-    const renderData = data.map((item, index) => {
+    const renderData = data.slice(startIndex, endIndex).map((item, index) => {
         const date = new Date(item.time);
         const year = date.getFullYear();
         let month = date.getMonth() + 1;
@@ -59,6 +70,45 @@ function Datasensor() {
         )
     });
 
+    const renderDivider = data.slice(0, data.length / 10+1).map((item, index) => {
+        if (index === indexClicked) {
+            return (
+                <span key={index} className={cx('clicked')} onClick={() => handleClick(index)}>
+                    {index + 1}
+                </span>
+            )
+        }
+        else {
+            return (
+                <span key={index}  onClick={() => handleClick(index)}>
+                    {index + 1}
+                </span>
+            )
+        }
+    });
+
+    const handleClick = (value) => {
+        if (value > indexClicked) {
+            setStartIndex(startIndex + (value - indexClicked) * 10);
+            setEndIndex((startIndex + (value - indexClicked) * 10) + 10);
+            setIndexClicked(value);
+        }
+        else if (value < indexClicked) {
+            setStartIndex(startIndex - (indexClicked - value) * 10);
+            setEndIndex((startIndex - (indexClicked - value) * 10) + 10);
+            setIndexClicked(value);
+        }
+        else {
+            return;
+        }
+    };
+
+    const reset = () => {
+        setIndexClicked(0);
+        setStartIndex(0);
+        setEndIndex(10);
+    }
+
     return (
         <div className={cx('ctn')}>
             <div className={cx('container')}>
@@ -79,6 +129,7 @@ function Datasensor() {
                             <SelectBox
                                 func = {setData}
                                 type = {'Data Sensor'}
+                                reset = {reset}
                             />
                             {data.length > 0 ?
                             (<table className={cx('table')}>
@@ -106,6 +157,10 @@ function Datasensor() {
                                 </span>
                                 <span className={cx('text')}>No data found for this period of time!</span>
                             </div>)}
+                        </div>
+
+                        <div className={cx('container-divide')}>
+                            {check ? renderDivider : ''}
                         </div>
                     </div>
                 </div>

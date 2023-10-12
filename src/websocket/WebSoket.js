@@ -26,12 +26,6 @@ function WebSocket(props) {
         };
     }, [props]);
 
-    // const renderMessage = messages.map((msg, index) => {
-    //     return (
-    //         <p key = {index}>{msg}</p>
-    //     )
-    // })
-
     return (
         <div className="App">
             {/* <h1>WebSocket Client</h1> */}
