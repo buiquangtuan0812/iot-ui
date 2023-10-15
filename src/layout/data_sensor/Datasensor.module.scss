@@ -4,7 +4,6 @@
     width: 100%;
     min-height: 100vh;
     .content {
-        padding: 40px;
         .card {
             background-color: #27293d;
             border-radius: 8px;
@@ -52,6 +51,14 @@
                     text-transform: uppercase;
                     font-size: 14px;
                     text-align: center;
+                    .icon-sort {
+                        margin-bottom: 4px;
+                        margin-left: 12px;
+                        font-size: 20px;
+                    }
+                    :hover {
+                        cursor: pointer;
+                    }
                 }
                 td {
                     text-align: center;

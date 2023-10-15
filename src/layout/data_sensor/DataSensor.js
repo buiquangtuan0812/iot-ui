@@ -5,6 +5,7 @@ import axios from "axios";
 import styles from "./Datasensor.module.scss";
 import Tippy from "@tippyjs/react/headless";
 import {HiBars3} from "react-icons/hi2";
+import {IoMdArrowDropdown, IoMdArrowDropup} from "react-icons/io";
 
 import Nav from "../../components/navbar/Nav";
 import SelectBox from "../../components/selectbox/SelectBox";
@@ -18,6 +19,9 @@ function Datasensor() {
     const [endIndex, setEndIndex] = useState(0);
     const [check, setCheck] = useState(false);
     const [indexClicked, setIndexClicked] = useState(0);
+    const [sortTemp, setSortTemp] = useState(false);
+    const [sortHumidity, setSortHumidity] = useState(false);
+    const [sortBrightness, setSortBrightness] = useState(false);
 
     useEffect(() => {
         axios.get("http://localhost:8008/data-sensor/get-all")
@@ -109,6 +113,41 @@ function Datasensor() {
         setEndIndex(10);
     }
 
+    const handleSortData = (type) => {
+        let dataSensor = data;
+        if (type === 'temperature') {
+            if (sortTemp) {
+                dataSensor.sort((a, b) => b.temperature - a.temperature);
+                setSortTemp(false);
+            }
+            else {
+                dataSensor.sort((a, b) => a.temperature - b.temperature);
+                setSortTemp(true);
+            }
+        }
+        else if (type === 'humidity') {
+            if (sortHumidity) {
+                dataSensor.sort((a, b) => b.humidity - a.humidity);
+                setSortHumidity(false);
+            }
+            else {
+                dataSensor.sort((a, b) => a.humidity - b.humidity);
+                setSortHumidity(true);
+            }
+        }
+        else {
+            if (sortBrightness) {
+                dataSensor.sort((a, b) => b.brightness - a.brightness);
+                setSortBrightness(false);
+            }
+            else {
+                dataSensor.sort((a, b) => a.brightness - b.brightness);
+                setSortBrightness(true);
+            }
+        }
+        setData(dataSensor);
+    }
+
     return (
         <div className={cx('ctn')}>
             <div className={cx('container')}>
@@ -137,9 +176,27 @@ function Datasensor() {
                                     <tr>
                                         <th scope="col" className={cx('id')}>Stt</th>
                                         <th scope="col">Ssid</th>
-                                        <th scope="col">Temperature</th>
-                                        <th scope="col">Humidity</th>
-                                        <th scope="col">Brightness</th>
+                                        <th scope="col">
+                                            <span>Temperature</span>
+                                            {!sortTemp ? 
+                                            <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
+                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
+                                            }
+                                        </th>
+                                        <th scope="col">
+                                            <span>Humidity</span>
+                                            {!sortHumidity ?
+                                            <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('humidity')}/></span>
+                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
+                                            }
+                                        </th>
+                                        <th scope="col">
+                                            <span>Brightness</span>
+                                            {!sortBrightness ?
+                                            <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('brightness')}/></span>
+                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
+                                        }
+                                        </th>
                                         <th scope="col">Time</th>
                                     </tr>
                                 </thead>

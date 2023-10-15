@@ -12,7 +12,7 @@ function AreaChartComponent(props) {
     if (dataSensor !== '') {
       const newData = [...data];
       newData.push({
-        name: dataSensor["time"].slice(0, 10) || "Now",
+        name: dataSensor["time"].slice(10, dataSensor["time"].length) || "Now",
         Temp: dataSensor["temp"],
         Humidity: dataSensor["humidity"],
         Bright: dataSensor["bright"]
@@ -26,7 +26,7 @@ function AreaChartComponent(props) {
 
   return (
     <div className={cx('container_chart')}>
-      <ResponsiveContainer width="100%" height={380}>
+      <ResponsiveContainer width="100%" height={360}>
         <AreaChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
@@ -41,7 +41,7 @@ function AreaChartComponent(props) {
           </Area>
         </AreaChart>
       </ResponsiveContainer>
-      <h5>Biểu đồ nhiệt độ, độ ẩm, ánh sáng.</h5>
+      <h6>Biểu đồ nhiệt độ, độ ẩm, ánh sáng.</h6>
     </div>
   );
 };

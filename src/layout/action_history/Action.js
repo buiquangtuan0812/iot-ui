@@ -5,6 +5,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import Tippy from "@tippyjs/react/headless";
 import {HiBars3} from "react-icons/hi2";
+import {IoMdArrowDropdown} from "react-icons/io";
 
 import Nav from "../../components/navbar/Nav";
 import SelectBox from "../../components/selectbox/SelectBox";
@@ -19,11 +20,13 @@ function Action() {
     const [endIndex, setEndIndex] = useState(0);
     const [check, setCheck] = useState(false);
     const [indexClicked, setIndexClicked] = useState(0);
+    const [oldData, setOldData] = useState(null);
 
     useEffect(() => {
         axios.get('http://localhost:8008/action-history/get-all')
             .then (response => {
                 setData(response.data);
+                setOldData(response.data);
                 if (response.data.length / 10 > 1) {
                     setEndIndex(10);
                     setCheck(true);
@@ -39,6 +42,20 @@ function Action() {
         return (
             <div>
                 <Nav props = {props}/>
+            </div>
+        )
+    };
+
+    const selectType = (type) => {
+        let dataAction = oldData;
+        setData(dataAction.filter(obj => obj.type === type));
+    };
+
+    const renderSelection = (prop) => {
+        return (
+            <div className={cx('container-type')}>
+                <div className={cx('type-item')} onClick={() => selectType('Light')}>Light</div>
+                <div className={cx('type-item')} onClick={() => selectType('Fan')}>Fan</div>
             </div>
         )
     };
@@ -62,7 +79,7 @@ function Action() {
                 <td  className={cx('id')}>{index + 1}</td>
                 <td>{item.ssid}</td>
                 <td>{item.type}</td>
-                <td>{item.action}</td>
+                <td>{item.action.trim()}</td>
                 <td>{time}</td>
             </tr>
         )
@@ -107,6 +124,11 @@ function Action() {
         setEndIndex(10);
     }
 
+    const filter = (data) => {
+        setData(data);
+        setOldData(data);
+    }
+
     return (
         <div className={cx('ctn')}>
             <div className={cx('container')}>
@@ -125,7 +147,7 @@ function Action() {
 
                         <div className={cx('card-body')}>
                             <SelectBox
-                                save = {setData}
+                                save = {filter}
                                 type = {'Action History'}
                                 reset = {reset}
                             />
@@ -136,7 +158,14 @@ function Action() {
                                     <tr>
                                         <th scope="col" className={cx('id')}>Stt</th>
                                         <th scope="col">Ssid</th>
-                                        <th scope="col">Type</th>
+                                        <th scope="col">
+                                            <span>Type</span>
+                                            <Tippy render={renderSelection} interactive placement="bottom"
+                                                offset={[5, 5]}
+                                            >
+                                                <span><IoMdArrowDropdown className={cx('icon-arrow')}/></span>
+                                            </Tippy>
+                                        </th>
                                         <th scope="col">Action</th>
                                         <th scope="col">Time</th>
                                     </tr>

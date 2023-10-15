@@ -1,6 +1,6 @@
 import classNames from "classnames/bind";
 import axios from "axios";
-import { useState } from "react";
+import {useState } from "react";
 import styles from "./SelectBox.module.scss";
 
 import {Select} from "antd";
@@ -99,7 +99,7 @@ function SelectBox(props) {
         setEnd(value);
         const timeStart = "2023-" + month + "-" + day + " " + start + ":00:00";
         const timeEnd = "2023-" + month + "-" + day + " " + value + ":00:00";
-        if (Number(value) >= Number(end)) {
+        if (Number(value) >= Number(start)) {
             if (props.type === "Data Sensor") {
                 axios.get('http://localhost:8008/data-sensor/filter-by-hour', {params: {start: timeStart, end: timeEnd}})
                     .then(res => props.func(res.data))
