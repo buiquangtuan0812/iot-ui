@@ -48,11 +48,15 @@ function Home() {
     };
 
     useEffect(() => {
-        const generateRandomDustLevel = () => {
-            const dust = Math.floor(Math.random() * (100 - 15)) + 15;
-            setDustLevel(dust);
+        client.onopen = () => {
+            console.log('WebSocket Client Connected');
+        };
 
-            if (dust >= 80) {
+        client.onmessage = (msg) => {
+            const data = JSON.parse(msg.data);
+            setDustLevel(data.dustLevel);
+            setDataSensor(data);
+            if (data.dustLevel >= 80) {
                 setStateFan(true);
                 setStateLed(true);
                 setIsDustAbout80(true);
@@ -69,40 +73,22 @@ function Home() {
                 setStateLed(false);
                 setIsDustAbout80(false);
             }
-        }
-
-        generateRandomDustLevel();
-        const dustLevelInterval = setInterval(generateRandomDustLevel, 3000);
-        return () => {
-            clearInterval(dustLevelInterval);
         };
-    }, []);
+    }, [dataSensor]);
 
     useEffect(() => {
         if (isDustAbout80) {
-            const intervalId = setInterval(() => {
+            const dustLevelInterval = setInterval(() => {
                 setStateFan((prev) => !prev);
                 setStateLed((prev) => !prev);
             }, 300);
             return () => {
-                clearInterval(intervalId);
+                if (dustLevelInterval) {
+                    clearInterval(dustLevelInterval);
+                }
             };
         };
     }, [isDustAbout80]);
-
-    useEffect(() => {
-        client.onopen = () => {
-            console.log('WebSocket Client Connected');
-        };
-
-        client.onmessage = (msg) => {
-            const data = JSON.parse(msg.data);
-            setDataSensor(data);
-        };
-        return () => {
-            client.close();
-        }
-    }, [dataSensor]);
 
     const renderTippy = (prop) => {
         return (

@@ -22,11 +22,14 @@ function Datasensor() {
     const [sortTemp, setSortTemp] = useState(false);
     const [sortHumidity, setSortHumidity] = useState(false);
     const [sortBrightness, setSortBrightness] = useState(false);
+    const [sortDustLevel, setSortDustLevel] = useState(false);
 
     useEffect(() => {
         axios.get("http://localhost:8008/data-sensor/get-all")
             .then(response => {
-                setData(response.data);
+                if (response.data.length > 0) {
+                    setData(response.data.reverse());
+                }
                 if (response.data.length / 10 > 1) {
                     setEndIndex(10);
                     setCheck(true);
@@ -69,6 +72,7 @@ function Datasensor() {
                 <td>{item.temperature}</td>
                 <td>{item.humidity}</td>
                 <td>{item.brightness}</td>
+                <td>{item.dustLevel}</td>
                 <td>{time}</td>
             </tr>
         )
@@ -135,6 +139,16 @@ function Datasensor() {
                 setSortHumidity(true);
             }
         }
+        else if (type === 'dustLevel') {
+            if (sortDustLevel) {
+                dataSensor.sort((a, b) => b.dustLevel - a.dustLevel);
+                setSortDustLevel(false);
+            }
+            else {
+                dataSensor.sort((a, b) => a.dustLevel - b.dustLevel);
+                setSortDustLevel(true);
+            }
+        }
         else {
             if (sortBrightness) {
                 dataSensor.sort((a, b) => b.brightness - a.brightness);
@@ -187,14 +201,21 @@ function Datasensor() {
                                             <span>Humidity</span>
                                             {!sortHumidity ?
                                             <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('humidity')}/></span>
-                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
+                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('humidity')}/></span>
                                             }
                                         </th>
                                         <th scope="col">
                                             <span>Brightness</span>
                                             {!sortBrightness ?
                                             <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('brightness')}/></span>
-                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
+                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('brightness')}/></span>
+                                        }
+                                        </th>
+                                        <th scope="col">
+                                            <span>DustLevel</span>
+                                            {!sortDustLevel ?
+                                            <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('dustLevel')}/></span>
+                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('dustLevel')}/></span>
                                         }
                                         </th>
                                         <th scope="col">Time</th>
