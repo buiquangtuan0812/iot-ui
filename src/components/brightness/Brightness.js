@@ -8,7 +8,7 @@ const cx = classNames.bind(styles);
 
 function Brightness({brightness}) {
     return (
-        <div className={cx(brightness <= 28 ? 'container_item-cloud' : (brightness >= 60 ? 'container_item-hot' : 'container_item-sun'))}>
+        <div className={cx(brightness <= 28 ? 'container_item-cloud' : (brightness >= 100 ? 'container_item-hot' : 'container_item-sun'))}>
             <div className={cx('description')}>
                 <p className={cx('title')}>Độ sáng</p>
                 <p className={cx('bright')}>{brightness}lux</p>
@@ -19,7 +19,7 @@ function Brightness({brightness}) {
                     brightness <= 28 ?
                         <AiFillCloud className={cx('icon')}/>
                     : (
-                        brightness >= 60 ? 
+                        brightness >= 100 ? 
                         <BsFillBrightnessHighFill className={cx('icon')}/>
                         : 
                         <BsFillBrightnessAltLowFill className={cx('icon')}/>

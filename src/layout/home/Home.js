@@ -10,9 +10,9 @@ import { w3cwebsocket as W3CWebSocket } from "websocket";
 import Temperature from "../../components/temperature/Temperature";
 import Humidity from "../../components/humidity/Humidity";
 import Brightness from "../../components/brightness/Brightness";
-import DustLevel from "../../components/dustLevel/DustLevel";
+// import DustLevel from "../../components/dustLevel/DustLevel";
 import AreaChart from "../../components/chart/DataSensorChart/AreaChart";
-import DustChartComponent from "../../components/chart/DustLevelChart/DustChart";
+// import DustChartComponent from "../../components/chart/DustLevelChart/DustChart";
 import Nav from "../../components/navbar/Nav";
 // import WebSocket from "../../websocket/WebSoket";
 
@@ -33,7 +33,11 @@ function Home() {
     const [stateLed, setStateLed] = useState(false);
     const [stateFan, setStateFan] = useState(false);
     const [dataSensor, setDataSensor] = useState(null);
-    const [dustLevel, setDustLevel] = useState(null);
+    const [totalLedOn, setTotalLedOn] = useState(0);
+    const [totalLedoff, setTotalLedOff] = useState(0);
+    const [totalFanOn, setTotalFanOn] = useState(0);
+    const [totalFanOff, setTotalFanOff] = useState(0);
+    // const [dustLevel, setDustLevel] = useState(null);
     const [isDustAbout80, setIsDustAbout80] = useState(false);
 
     const getFormattedTimestamp = () =>{
@@ -46,6 +50,42 @@ function Home() {
         let second = String(date.getSeconds()).padStart(2, '0');
         return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     };
+    useEffect(() => {
+        axios.get('http://localhost:8008/action-history/get-all')
+            .then(response => {
+                const data = response.data;
+                let onLed = 0;
+                let offLed = 0;
+                let onFan = 0;
+                let offFan = 0;
+                let historyLed = null;
+                let historyFan = null;
+                data.map((value, key) =>{
+                    if (value.type.includes('Light') && value.action.includes('On')) {
+                        onLed += 1;
+                        historyLed = true;
+                    }
+                    else if (value.type.includes('Light') && value.action.includes('Off')) {
+                        offLed += 1;
+                        historyLed = false;
+                    }
+                    else if (value.type.includes('Fan') && value.action.includes('On')) {
+                        onFan += 1;
+                        historyFan = true;
+                    }
+                    else {
+                        offFan += 1;
+                        historyFan = false;
+                    }
+                });
+                setTotalFanOn(onFan);
+                setTotalFanOff(offFan);
+                setTotalLedOn(onLed);
+                setTotalLedOff(offLed);
+                setControlFan(historyFan);
+                setControlLight(historyLed);
+            })
+    }, []);
 
     useEffect(() => {
         client.onopen = () => {
@@ -54,41 +94,41 @@ function Home() {
 
         client.onmessage = (msg) => {
             const data = JSON.parse(msg.data);
-            setDustLevel(data.dustLevel);
+            // setDustLevel(data.dustLevel);
             setDataSensor(data);
-            if (data.dustLevel >= 80) {
-                setStateFan(true);
-                setStateLed(true);
-                setIsDustAbout80(true);
-                axios.post('http://localhost:8008/mosquitto/warning')
-                    .then(response => {
-                        console.log(response.data);
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    });
-            }
-            else {
-                setStateFan(false);
-                setStateLed(false);
-                setIsDustAbout80(false);
-            }
+            // if (data.dustLevel >= 80) {
+            //     setStateFan(true);
+            //     setStateLed(true);
+            //     setIsDustAbout80(true);
+            //     axios.post('http://localhost:8008/mosquitto/warning')
+            //         .then(response => {
+            //             console.log(response.data);
+            //         })
+            //         .catch(err => {
+            //             console.log(err);
+            //         });
+            // }
+            // else {
+            //     setStateFan(false);
+            //     setStateLed(false);
+            //     setIsDustAbout80(false);
+            // }
         };
     }, [dataSensor]);
 
-    useEffect(() => {
-        if (isDustAbout80) {
-            const dustLevelInterval = setInterval(() => {
-                setStateFan((prev) => !prev);
-                setStateLed((prev) => !prev);
-            }, 300);
-            return () => {
-                if (dustLevelInterval) {
-                    clearInterval(dustLevelInterval);
-                }
-            };
-        };
-    }, [isDustAbout80]);
+    // useEffect(() => {
+    //     if (isDustAbout80) {
+    //         const dustLevelInterval = setInterval(() => {
+    //             setStateFan((prev) => !prev);
+    //             setStateLed((prev) => !prev);
+    //         }, 300);
+    //         return () => {
+    //             if (dustLevelInterval) {
+    //                 clearInterval(dustLevelInterval);
+    //             }
+    //         };
+    //     };
+    // }, [isDustAbout80]);
 
     const renderTippy = (prop) => {
         return (
@@ -105,6 +145,12 @@ function Home() {
         const time = getFormattedTimestamp();
         let action;
         if (deviceType === 'Light') {
+            if (isLightOn) {
+                setTotalLedOff(totalLedoff+1);
+            }
+            else {
+                setTotalLedOn(totalLedOn+1);
+            }
             setControlLight(!isLightOn);
             action =
                 (isLightOn && isFanOn) ? 'Off Led On Fan' :
@@ -112,6 +158,12 @@ function Home() {
                 (!isLightOn && !isFanOn) ? 'On Led Off Fan' : 'On Led On Fan';
         }
         else {
+            if (isFanOn) {
+                setTotalFanOff(totalFanOff+1);
+            }
+            else {
+                setTotalFanOn(totalFanOn+1);
+            }
             setControlFan(!isFanOn);
             action =
                 (isLightOn && isFanOn) ? 'On Led Off Fan' :
@@ -152,30 +204,32 @@ function Home() {
             </div>
             <div className={cx('container_app-header')}>
                 <div className={cx('row')}>
-                    <div className={cx('col-3')}>
+                    <div className={cx('col-4')}>
                         <Temperature temp = {dataSensor ? dataSensor["temp"] : ''}/>
                     </div>
-                    <div className={cx('col-3')}>
+                    <div className={cx('col-4')}>
                         <Humidity humidity = {dataSensor ? dataSensor["humidity"] : ''}/>
                     </div>
-                    <div className={cx('col-3')}>
+                    <div className={cx('col-4')}>
                         <Brightness brightness = {dataSensor ? dataSensor["bright"] : ''}/>
                     </div>
-                    <div className={cx('col-3')}>
+                    {/* <div className={cx('col-3')}>
                         <DustLevel dustLevel = {dustLevel}/>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <div className={cx('container_app-body')}>
                 <div className={cx('row')}>
-                    <div className={cx('col-6')}>
+                    <div className={cx('col-9')}>
                         <AreaChart data = {dataSensor ? dataSensor : ''}/>
                     </div>
-                    <div className={cx('col-4')}>
+                    {/* <div className={cx('col-4')}>
                         <DustChartComponent data = {dustLevel}/>
-                    </div>
-                    <div className={cx('col-2')}>
+                    </div> */}
+                    <div className={cx('col-3')}>
                         <div className={cx('item-light')}>
+                            <div>Total On: {totalLedOn}</div>
+                            <div>Total Off: {totalLedoff}</div>
                             {isDustAbout80 ? (
                                 stateLed ? (
                                 <img src={ImgLight} alt="Light On" className={cx('light-on')} />
@@ -199,6 +253,8 @@ function Home() {
                             )}
                         </div>
                         <div className={cx('item-fan')}>
+                            <div>Total On: {totalFanOn}</div>
+                            <div>Total Off: {totalFanOff}</div>
                             {isDustAbout80 ? (
                                 stateFan ? (
                                     <img src={ImgLight} alt="Fan On" className={cx('fan-on')} />

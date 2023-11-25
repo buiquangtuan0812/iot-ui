@@ -14,28 +14,36 @@ const cx = classNames.bind(styles);
 
 function Datasensor() {
     const location = useLocation();
+    const [keyValue, setKey] = useState('');
     const [data, setData] = useState([]);
-    const [startIndex, setStartIndex] = useState(0);
-    const [endIndex, setEndIndex] = useState(0);
     const [check, setCheck] = useState(false);
-    const [indexClicked, setIndexClicked] = useState(0);
+    const [endIndex, setEndIndex] = useState(0);
+    const [column, setColumn] = useState('All');
+    const [originData, setOriginData] = useState([]);
     const [sortTemp, setSortTemp] = useState(false);
+    const [startIndex, setStartIndex] = useState(0);
+    const [dataCurrent, setDataCurrent] = useState([]);
+    const [indexClicked, setIndexClicked] = useState(0);
+    const [showHumidity, setShowHumidity] = useState(true);
     const [sortHumidity, setSortHumidity] = useState(false);
-    const [sortBrightness, setSortBrightness] = useState(false);
     const [sortDustLevel, setSortDustLevel] = useState(false);
+    const [showBrightness, setShowBrightness] = useState(true);
+    const [sortBrightness, setSortBrightness] = useState(false);
+    const [showTemperature, setShowTemperature] = useState(true);
 
     useEffect(() => {
         axios.get("http://localhost:8008/data-sensor/get-all")
             .then(response => {
-                if (response.data.length > 0) {
-                    setData(response.data.reverse());
-                }
-                if (response.data.length / 10 > 1) {
+                let data = response.data;
+                data = data.reverse();
+                setData(data.reverse());
+                setOriginData(data.reverse());
+                if (data.length / 10 > 1) {
                     setEndIndex(10);
                     setCheck(true);
                 }
                 else {
-                    setEndIndex(response.data.length);
+                    setEndIndex(data.length);
                 }
             })
             .catch(err => {
@@ -69,10 +77,16 @@ function Datasensor() {
             <tr key = {index}>
                 <td  className={cx('id')}>{index + 1}</td>
                 <td>{item.ssid}</td>
-                <td>{item.temperature}</td>
-                <td>{item.humidity}</td>
-                <td>{item.brightness}</td>
-                <td>{item.dustLevel}</td>
+                {item.temperature ? 
+                    <td>{item.temperature}</td> : ''
+                }
+                {item.humidity ? 
+                    <td>{item.humidity}</td> : ''
+                }
+                {item.brightness ?
+                    <td>{item.brightness}</td> : ''
+                }
+                {/* <td>{item.dustLevel}</td> */}
                 <td>{time}</td>
             </tr>
         )
@@ -162,6 +176,63 @@ function Datasensor() {
         setData(dataSensor);
     }
 
+    const handleOnChangeSelect = (value) => {
+        setColumn(value);
+        if (value === 'temperature') {
+            setShowHumidity(false);
+            setShowTemperature(true);
+            setShowBrightness(false);
+        }
+        else if (value === 'humidity') {
+            setShowHumidity(true);
+            setShowTemperature(false);
+            setShowBrightness(false);
+        }
+        else if (value === 'brightness') {
+            setShowHumidity(false);
+            setShowTemperature(false);
+            setShowBrightness(true);
+        } 
+        else {
+            setShowHumidity(true);
+            setShowTemperature(true);
+            setShowBrightness(true);
+            setData([...originData]);
+            return;
+        }
+        const dataSensor = [...originData];
+        const keys = ['ssid', value, 'time'];
+        const newData = dataSensor.map(data => {
+            const extractedData = {};
+            keys.forEach(key => {
+                extractedData[key] = data[key];
+            });
+            return extractedData;
+        })
+        setData(newData);
+        setDataCurrent(newData);
+    };
+
+    const handleSearch = () => {
+        const dataSensor = [...data];
+        const newData = dataSensor.filter(sensor => {
+            const keys = Object.keys(sensor);
+            for (const key of keys) {
+                if (String(sensor[key]).includes(keyValue)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+        setData(newData);
+    };
+
+    const handleFilter = (data) => {
+        setData(data);
+        setDataCurrent(data);
+    }
+    
+
     return (
         <div className={cx('ctn')}>
             <div className={cx('container')}>
@@ -169,6 +240,22 @@ function Datasensor() {
                     <div className={cx('card')}>
                         <div className={cx('card-header')}>
                             <h4>Data Sensor</h4>
+                            <div className={cx('search')}>
+                                <select onChange={(e) => handleOnChangeSelect(e.target.value)}>
+                                    <option value='All'>All</option>
+                                    <option value='temperature'>Temperature</option>
+                                    <option value='humidity'>Humidity</option>
+                                    <option value='brightness'>Brightness</option>
+                                </select>
+
+                                <div className={cx('input-search')}>
+                                    <input placeholder="Enter the key" type="text"
+                                        aria-hidden="true" role="presentation" 
+                                        onChange={(e) => setKey(e.target.value)}
+                                    />
+                                    <button onClick={handleSearch}>Search</button>
+                                </div>
+                            </div>
                             <Tippy render={renderTippy} interactive delay={[200, 100]}
                                 offset={[-85, 10]} placement="bottom"
                             >
@@ -180,9 +267,10 @@ function Datasensor() {
 
                         <div className={cx('card-body')}>
                             <SelectBox
-                                func = {setData}
+                                func = {handleFilter}
                                 type = {'Data Sensor'}
                                 reset = {reset}
+                                column = {column}
                             />
                             {data.length > 0 ?
                             (<table className={cx('table')}>
@@ -190,34 +278,40 @@ function Datasensor() {
                                     <tr>
                                         <th scope="col" className={cx('id')}>Stt</th>
                                         <th scope="col">Ssid</th>
-                                        <th scope="col">
-                                            <span>Temperature</span>
-                                            {!sortTemp ? 
-                                            <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
-                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
-                                            }
-                                        </th>
-                                        <th scope="col">
-                                            <span>Humidity</span>
-                                            {!sortHumidity ?
-                                            <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('humidity')}/></span>
-                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('humidity')}/></span>
-                                            }
-                                        </th>
-                                        <th scope="col">
-                                            <span>Brightness</span>
-                                            {!sortBrightness ?
-                                            <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('brightness')}/></span>
-                                            : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('brightness')}/></span>
+                                        {showTemperature ?
+                                            <th scope="col">
+                                                <span>Temperature</span>
+                                                {!sortTemp ? 
+                                                <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
+                                                : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('temperature')}/></span>
+                                                }
+                                            </th> : ''
                                         }
-                                        </th>
-                                        <th scope="col">
+                                        {showHumidity ? 
+                                            <th scope="col">
+                                                <span>Humidity</span>
+                                                {!sortHumidity ?
+                                                <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('humidity')}/></span>
+                                                : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('humidity')}/></span>
+                                                }
+                                            </th> : ''
+                                        }
+                                        {showBrightness ?
+                                            <th scope="col">
+                                                <span>Brightness</span>
+                                                {!sortBrightness ?
+                                                <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('brightness')}/></span>
+                                                : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('brightness')}/></span>
+                                            }
+                                            </th> : ''
+                                        }
+                                        {/* <th scope="col">
                                             <span>DustLevel</span>
                                             {!sortDustLevel ?
                                             <span><IoMdArrowDropdown className={cx('icon-sort')} onClick={() => handleSortData('dustLevel')}/></span>
                                             : <span><IoMdArrowDropup className={cx('icon-sort')} onClick={() => handleSortData('dustLevel')}/></span>
                                         }
-                                        </th>
+                                        </th> */}
                                         <th scope="col">Time</th>
                                     </tr>
                                 </thead>

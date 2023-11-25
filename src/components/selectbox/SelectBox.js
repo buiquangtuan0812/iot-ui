@@ -22,24 +22,24 @@ function SelectBox(props) {
             const timeStart = time + " " + start + ":00:00";
             const timeEnd = time + " " + end + ":00:00";
             if (props.type === "Data Sensor") {
-                axios.get('http://localhost:8008/data-sensor/filter-by-hour', {params: {start: timeStart, end: timeEnd}})
+                axios.get('http://localhost:8008/data-sensor/filter-by-hour', {params: {start: timeStart, end: timeEnd, column: props.column}})
                     .then(res => props.func(res.data.reverse()))
                     .catch(err => console.error(err));
             }
             else {
-                axios.get('http://localhost:8008/action-history/filter-by-hour', {params: {start: timeStart, end: timeEnd}})
+                axios.get('http://localhost:8008/action-history/filter-by-hour', {params: {start: timeStart, end: timeEnd, column: props.column}})
                     .then(res => props.save(res.data.reverse()))
                     .catch(err => console.error(err));
             }
         }
         else {
             if (props.type === "Data Sensor") {
-                axios.get('http://localhost:8008/data-sensor/filter-by-day', {params: {time: time}})
+                axios.get('http://localhost:8008/data-sensor/filter-by-day', {params: {time: time, column: props.column}})
                     .then(res => props.func(res.data.reverse()))
                     .catch(err => console.error(err));
             }
             else {
-                axios.get('http://localhost:8008/action-history/filter-by-day', {params: {time: time}})
+                axios.get('http://localhost:8008/action-history/filter-by-day', {params: {time: time, column: props.column}})
                     .then(res => props.save(res.data.reverse()))
                     .catch(err => console.error(err));
             }
@@ -53,24 +53,24 @@ function SelectBox(props) {
             const timeStart = time + " " + start + ":00:00";
             const timeEnd = time + " " + end + ":00:00";
             if (props.type === "Data Sensor") {
-                axios.get('http://localhost:8008/data-sensor/filter-by-hour', {params: {start: timeStart, end: timeEnd}})
+                axios.get('http://localhost:8008/data-sensor/filter-by-hour', {params: {start: timeStart, end: timeEnd, column: props.column}})
                     .then(res => props.func(res.data.reverse()))
                     .catch(err => console.error(err));
             }
             else {
-                axios.get('http://localhost:8008/action-history/filter-by-hour', {params: {start: timeStart, end: timeEnd}})
+                axios.get('http://localhost:8008/action-history/filter-by-hour', {params: {start: timeStart, end: timeEnd, column: props.column}})
                     .then(res => props.save(res.data.reverse()))
                     .catch(err => console.error(err));
             }
         }
         else {
             if (props.type === "Data Sensor") {
-                axios.get('http://localhost:8008/data-sensor/filter-by-day', {params: {time: time}})
+                axios.get('http://localhost:8008/data-sensor/filter-by-day', {params: {time: time, column: props.column}})
                     .then(res => props.func(res.data.reverse()))
                     .catch(err => console.error(err));
             }
             else {
-                axios.get('http://localhost:8008/action-history/filter-by-day', {params: {time: time}})
+                axios.get('http://localhost:8008/action-history/filter-by-day', {params: {time: time, column: props.column}})
                     .then(res => props.save(res.data.reverse()))
                     .catch(err => console.error(err));
             }
@@ -83,12 +83,12 @@ function SelectBox(props) {
         const timeEnd = "2023-" + month + "-" + day + " " + end + ":00:00";
         if (Number(value) <= Number(end)) {
             if (props.type === "Data Sensor") {
-                axios.get('http://localhost:8008/data-sensor/filter-by-hour', {params: {start: timeStart, end: timeEnd}})
+                axios.get('http://localhost:8008/data-sensor/filter-by-hour', {params: {start: timeStart, end: timeEnd, column: props.column}})
                     .then(res => props.func(res.data.reverse()))
                     .catch(err => console.error(err));
             }
             else {
-                axios.get('http://localhost:8008/action-history/filter-by-hour', {params: {start: timeStart, end: timeEnd}})
+                axios.get('http://localhost:8008/action-history/filter-by-hour', {params: {start: timeStart, end: timeEnd, column: props.column}})
                     .then(res => props.save(res.data.reverse()))
                     .catch(err => console.error(err));
             }
@@ -101,12 +101,12 @@ function SelectBox(props) {
         const timeEnd = "2023-" + month + "-" + day + " " + value + ":00:00";
         if (Number(value) >= Number(start)) {
             if (props.type === "Data Sensor") {
-                axios.get('http://localhost:8008/data-sensor/filter-by-hour', {params: {start: timeStart, end: timeEnd}})
+                axios.get('http://localhost:8008/data-sensor/filter-by-hour', {params: {start: timeStart, end: timeEnd, column: props.column}})
                     .then(res => props.func(res.data.reverse()))
                     .catch(err => console.error(err));
             }
             else {
-                axios.get('http://localhost:8008/action-history/filter-by-hour', {params: {start: timeStart, end: timeEnd}})
+                axios.get('http://localhost:8008/action-history/filter-by-hour', {params: {start: timeStart, end: timeEnd, column: props.column}})
                     .then(res => props.save(res.data.reverse()))
                     .catch(err => console.error(err));
             }

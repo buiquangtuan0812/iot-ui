@@ -16,17 +16,21 @@ function Action() {
     const location = useLocation();
     const props = location.state;
     const [data, setData] = useState([]);
-    const [startIndex, setStartIndex] = useState(0);
-    const [endIndex, setEndIndex] = useState(0);
     const [check, setCheck] = useState(false);
+    const [endIndex, setEndIndex] = useState(0);
+    const [oldData, setOldData] = useState([]);
+    const [keyValue, setKeyValue] = useState('');
+    const [startIndex, setStartIndex] = useState(0);
+    const [currentData, setCurrentData] = useState([]);
     const [indexClicked, setIndexClicked] = useState(0);
-    const [oldData, setOldData] = useState(null);
 
     useEffect(() => {
         axios.get('http://localhost:8008/action-history/get-all')
             .then (response => {
-                setData(response.data);
-                setOldData(response.data);
+                let data = response.data;
+                data = data.reverse();
+                setData(data);
+                setOldData(data);
                 if (response.data.length / 10 > 1) {
                     setEndIndex(10);
                     setCheck(true);
@@ -49,6 +53,12 @@ function Action() {
     const selectType = (type) => {
         let dataAction = oldData;
         setData(dataAction.filter(obj => obj.type === type));
+        setCurrentData(dataAction.filter(obj => obj.type === type));
+    };
+
+    const selectAction = (action) => {
+        let dataAction = currentData;
+        setData(dataAction.filter(obj => obj.action.includes(action)));
     };
 
     const renderSelection = (prop) => {
@@ -56,6 +66,15 @@ function Action() {
             <div className={cx('container-type')}>
                 <div className={cx('type-item')} onClick={() => selectType('Light')}>Light</div>
                 <div className={cx('type-item')} onClick={() => selectType('Fan')}>Fan</div>
+            </div>
+        )
+    };
+
+    const renderSelect = (prop) => {
+        return (
+            <div className={cx('container-type')}>
+                <div className={cx('type-item')} onClick={() => selectAction('On')}>On</div>
+                <div className={cx('type-item')} onClick={() => selectAction('Off')}>Off</div>
             </div>
         )
     };
@@ -119,15 +138,29 @@ function Action() {
     };
 
     const reset = () => {
-        setIndexClicked(0);
-        setStartIndex(0);
         setEndIndex(10);
+        setStartIndex(0);
+        setIndexClicked(0);
     }
 
     const filter = (data) => {
         setData(data);
         setOldData(data);
     }
+
+    const handleSearch = () => {
+        const dataSensor = [...oldData];
+        const newData = dataSensor.filter(sensor => {
+            const keys = Object.keys(sensor);
+            for (const key of keys) {
+                if (String(sensor[key]).includes(keyValue)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+        setData(newData);
+    };
 
     return (
         <div className={cx('ctn')}>
@@ -136,6 +169,15 @@ function Action() {
                     <div className={cx('card')}>
                         <div className={cx('card-header')}>
                             <h4>Action History</h4>
+                            <div className={cx('search')}>
+                                <div className={cx('input-search')}>
+                                    <input placeholder="Enter the key" type="text"
+                                        aria-hidden="true" role="presentation" 
+                                        onChange={(e) => setKeyValue(e.target.value)}
+                                    />
+                                    <button onClick={handleSearch}>Search</button>
+                                </div>
+                            </div>
                             <Tippy render={renderTippy} interactive delay={[200, 100]}
                                 offset={[-85, 10]} placement="bottom"
                             >
@@ -166,7 +208,14 @@ function Action() {
                                                 <span><IoMdArrowDropdown className={cx('icon-arrow')}/></span>
                                             </Tippy>
                                         </th>
-                                        <th scope="col">Action</th>
+                                        <th scope="col">
+                                            <span>Action</span>
+                                            <Tippy render={renderSelect} interactive placement="bottom"
+                                                offset={[5, 5]}
+                                            >
+                                                <span><IoMdArrowDropdown className={cx('icon-arrow')}/></span>
+                                            </Tippy>
+                                        </th>
                                         <th scope="col">Time</th>
                                     </tr>
                                 </thead>

@@ -21,6 +21,28 @@
                     color: #fff;
                     font-weight: 100;
                 }
+                .search {
+                    display: flex;
+                    align-items: center;
+                    font-size: 14px;
+                    justify-content: center;
+                    .input-search {
+                        padding: 4px 12px;
+                        border-radius: 10px;
+                        border: 1px solid #ccc;
+                        background-color: #fff;
+                        input {
+                            width: 560px;
+                            border: none;
+                            outline: none;
+                        }
+                        button {
+                            border: none;
+                            color: #e14eca;
+                            background-color: #fff;
+                        }
+                    }
+                }
                 .icon-nav {
                     .icon {
                         font-size: 32px;
