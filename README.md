@@ -4,5 +4,6 @@
 ## Công cụ, ngôn ngữ sử dụng
 
   1. ReactJS
-  2. Websocket
-  3. library: axios, chart.js, websocket
+  2. HTML, SCSS, Javascript
+  3. Websocket
+  4. library: axios, chart.js, websocket
